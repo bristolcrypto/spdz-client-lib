@@ -1,0 +1,51 @@
+{
+  "name": "spdz-client-lib",
+  "version": "0.1.0",
+  "description":
+    "A client library to the SPDZ Proxies to manage external client input and output.",
+  "author": {
+    "name": "bristolcrypto"
+  },
+  "license": "See license in License.txt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bristolcrypto/spdz-client-lib"
+  },
+  "keywords": ["spdz", "demonstrator", "library", "api"],
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-jest": "20.0.3",
+    "babel-preset-es2015": "^6.24.1",
+    "documentation": "^5.3.3",
+    "eslint": "^3.19.0",
+    "eslint-config-prettier": "^2.6.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "jest": "^20.0.4",
+    "mock-socket": "^6.1.0",
+    "node-fetch": "^1.7.1",
+    "prettier": "^1.7.4",
+    "whatwg-fetch": "^2.0.3"
+  },
+  "dependencies": {
+    "assert": "^1.4.1",
+    "baconjs": "^0.7.93",
+    "big-integer": "^1.6.23",
+    "buffer": "^5.0.6",
+    "http-status-codes": "^1.1.6",
+    "libsodium": "^0.5.1",
+    "libsodium-wrappers": "^0.5.1",
+    "object-assign": "4.1.1",
+    "promise": "7.1.1",
+    "socket.io-client": "^2.0.4"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "scripts/build.sh",
+    "test": "jest --onlyChanged --watch",
+    "apidoc":
+      "documentation build src/* -f md -o api.md -a public -c documentation.yml"
+  },
+  "babel": {
+    "presets": ["es2015"]
+  }
+}

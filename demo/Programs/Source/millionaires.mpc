@@ -1,0 +1,80 @@
+# (C) 2017 University of Bristol. See License.txt
+"""
+  Solve Millionaires problem to deduce the maximum value from up to 8 players.
+
+  Demonstrate using clients external to computing parties supplying input and receiving
+   a result.
+"""
+
+from Compiler.types import sint, regint, Array, MemValue, ClientMessageType
+from Compiler.instructions import listen, acceptclientconnection
+from Compiler.library import print_ln, do_while, for_range
+from Compiler.util import if_else
+
+PORTNUM = 14000
+MAX_NUM_CLIENTS = 8
+
+def accept_client_input():
+    """
+    Wait for socket connection, send share of random value, receive input and deduce share.
+    Expect 3 inputs: unique id, bonus value and flag to indicate end of this round.
+    """
+    client_socket_id = regint()
+    acceptclientconnection(client_socket_id, PORTNUM)
+    
+    client_inputs = sint.receive_from_client(3, client_socket_id, ClientMessageType.TripleShares)
+
+    return client_socket_id, client_inputs[0], client_inputs[1], client_inputs[2]
+
+
+def determine_winner(number_clients, client_values, client_ids):
+    """Work out and return client_id which corresponds to max client_value"""
+    max_value = Array(1, sint)
+    max_value[0] = client_values[0]
+    win_client_id = Array(1, sint)
+    win_client_id[0] = client_ids[0]
+
+    @for_range(number_clients-1)
+    def loop_body(i):
+        # Is this client input a new maximum, will be sint(1) if true, else sint(0)
+        is_new_max = max_value[0] < client_values[i+1]
+        # Keep latest max_value
+        max_value[0] = if_else(is_new_max, client_values[i+1], max_value[0])
+        # Keep current winning client id
+        win_client_id[0] = if_else(is_new_max, client_ids[i+1], win_client_id[0])
+
+    return regint(win_client_id[0].reveal())
+
+def main():
+    """Listen in while loop for players to join a game.
+    Once maxiumum reached or have notified that round finished, run comparison and return result."""
+    # Start listening for client socket connections
+    listen(PORTNUM)
+    print_ln('Listening for client connections on base port %s', PORTNUM)
+
+    # Clients socket id (integer).
+    client_sockets = Array(MAX_NUM_CLIENTS, regint)
+    # Number of clients
+    number_clients = MemValue(regint(0))
+    # Clients secret input.
+    client_values = Array(MAX_NUM_CLIENTS, sint)
+    # Client ids to identity client
+    client_ids = Array(MAX_NUM_CLIENTS, sint)
+
+    # Loop round waiting for each client to connect
+    @do_while
+    def client_connections():
+        client_sockets[number_clients], client_ids[number_clients], client_values[number_clients], finish = accept_client_input()
+        number_clients.write(number_clients+1)
+
+        # continue while both expressions are false
+        return (number_clients >= MAX_NUM_CLIENTS) + finish.reveal() == 0 
+
+    winning_client_id = determine_winner(number_clients, client_values, client_ids)
+
+    """Send winning client_id to all clients who joined game."""
+    @for_range(number_clients)
+    def loop_body(i):
+        regint.write_to_socket(client_sockets[i], winning_client_id, ClientMessageType.Int32)    
+
+main()

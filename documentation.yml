@@ -1,0 +1,55 @@
+# Used by documentation.js tool to organise api docs generation.
+toc:
+  - name: WebSocket and Rx Streams Interface
+    description: |
+      Client interface to connect to all SPDZ Proxies using web sockets. Returns [bacon.js](https://github.com/baconjs/bacon.js) reactive streams.
+    children:
+      - connectToSpdzProxyPromise
+      - connectToSpdzPartyPromise
+      - sendSecretInputsPromise
+      - sendClearInputsPromise
+      - disconnectFromSpdzPartyPromise   
+  - name: REST client interface
+    description: |
+      Client interface to connect to all SPDZ Proxies using a REST interface.
+
+      These functions use `fetch` which may require a polyfill to be installed by the calling application.
+
+      Browser applications are suggested to use `require('whatwg-fetch')` which is included by default with create-react-app. Native fetch may be available in the browser.
+
+      Node applications are suggested to use `require('isomorphic-fetch')` which pulls in `node-fetch`. Node needs the polyfill.
+      
+      A promise polyfill is already included.
+    children:
+      - connectToSPDZ
+      - checkProxies
+      - allProxiesConnected
+      - consumeDataFromProxies
+      - sendInputsWithShares
+      - retrieveRegIntsAsHexString
+      - disconnectFromSPDZ
+      - NoContentError
+      - ProxyStatusCodes
+  - name: Bootstrap interface
+    description: |
+      A websocket interface to allow a client to start a SPDZ process.
+    children:
+      - bootstrapConnectSetup
+      - runSpdzProgram
+  - name: Crypto functions
+    description: |
+      Provide cryptographic functions to manage keys and encryption between client and SPDZ.
+      Note that the crypto functions use libsodium with [restricted browser support](https://github.com/jedisct1/libsodium.js).
+    children:
+      - createClientPublicKey
+      - setDHKeyPair
+      - createEncryptionKey
+      - decrypt
+  - name: Utility functions
+    description: |
+      Other functions which may be of use.
+    children:
+     - binaryToIntArray
+     - initFixedPointParams
+     - logger
+
